@@ -1,4 +1,26 @@
-const menuItems = [
+import React from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+
+type UserRole = 'admin' | 'teacher' | 'student' | 'parent';
+
+interface MenuItem {
+  icon: string;
+  label: string;
+  href: string;
+  visible: UserRole[];
+}
+
+interface MenuSection {
+  title: string;
+  items: MenuItem[];
+}
+
+interface MenuProps {
+  userRole?: UserRole;
+}
+
+const menuItems: MenuSection[] = [
   {
     title: "MENU",
     items: [
@@ -112,3 +134,41 @@ const menuItems = [
     ],
   },
 ];
+
+const Menu: React.FC<MenuProps> = ({ userRole }) => {
+  return (
+    <nav className="flex flex-col w-full">
+      {menuItems.map((section, sectionIndex) => (
+        <div key={sectionIndex} className="mb-4">
+          <h3 className="hidden lg:block text-xs font-medium text-gray-400 mb-3 px-2">{section.title}</h3>
+          <ul className="space-y-1">
+            {section.items
+              .filter(item => !userRole || item.visible.includes(userRole))
+              .map((item, itemIndex) => (
+                <li key={itemIndex}>
+                  <Link 
+                    href={item.href} 
+                    className="flex items-center justify-center lg:justify-start gap-3 px-2 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-150"
+                  >
+                    <div className="relative w-6 h-6 flex-shrink-0">
+                      <Image
+                        src={item.icon}
+                        alt={item.label}
+                        width={24}
+                        height={24}
+                        className="object-contain"
+                        priority
+                      />
+                    </div>
+                    <span className="hidden lg:block text-sm">{item.label}</span>
+                  </Link>
+                </li>
+              ))}
+          </ul>
+        </div>
+      ))}
+    </nav>
+  );
+};
+
+export default Menu;
